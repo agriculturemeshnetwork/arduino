@@ -30,17 +30,24 @@
 /* LED pin */
 int led = 5;
 /* LED state */
-volatile byte state = LOW;
+byte state = LOW;
 
 // Singleton instance of the radio driver
 RH_RF95 driver(RFM95_CS, RFM95_INT);
 
 RHMesh manager(driver, SERVER1_ADDRESS);
 
+
+void led_state(){
+  state = !state;
+  digitalWrite(led, state);
+}
+
 void setup() 
 {
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
+  pinMode(led, OUTPUT);
   
   while (!Serial);
   Serial.begin(115200);
@@ -79,9 +86,11 @@ char data[] = "And hello back to you from server1";
 uint8_t buf[RH_MESH_MAX_MESSAGE_LEN];
 void loop()
 {
-  Serial.println();
+  Serial.println("Aloha FUNT");
   uint8_t len = sizeof(buf);
   uint8_t from;
+  led_state();
+
   if (manager.recvfromAck(buf, &len, &from))
   {
     Serial.print("got request from : 0x");
