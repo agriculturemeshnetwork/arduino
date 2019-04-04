@@ -38,12 +38,40 @@ RHMesh manager(driver, SERVER1_ADDRESS);
 
 void setup() 
 {
-  delay(2000);
-  Serial.begin(9600);
-  if (!manager.init())
-    Serial.println("RF22 init failed");
-  // Defaults after init are 434.0MHz, 0.05MHz AFC pull-in, modulation FSK_Rb2_4Fd36
+  pinMode(RFM95_RST, OUTPUT);
+  digitalWrite(RFM95_RST, HIGH);
+  
+  while (!Serial);
+  Serial.begin(115200);
+  delay(100);
+
+  
+  Serial.println("Begin MESH testing");
+  // manual reset
+  digitalWrite(RFM95_RST, LOW);
+  delay(10);
+  digitalWrite(RFM95_RST, HIGH);
+  delay(10);
+
+ while (!driver.init()) {
+    Serial.println("LoRa radio init failed");
+    while (1);
+  }
+  Serial.println("LoRa radio init OK!");
+
+  
+  if (!driver.setFrequency(RF95_FREQ)) {
+    Serial.println("setFrequency failed");
+    while (1);
+  }
+  Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+
+  driver.setTxPower(23, false);
+
 }
+
+
+
 
 char data[] = "And hello back to you from server1";
 // Dont put this on the stack:
