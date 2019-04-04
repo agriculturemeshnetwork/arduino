@@ -48,7 +48,7 @@ void setup()
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
   pinMode(led, OUTPUT);
-  
+
   while (!Serial);
   Serial.begin(115200);
   delay(100);
@@ -97,10 +97,13 @@ void loop()
     Serial.print(from, HEX);
     Serial.print(": ");
     Serial.println((char*)buf);
+    // led_state();
 
     // Send a reply back to the originator client
-    if (manager.sendtoWait((uint8_t *)data, sizeof(data), from) != RH_ROUTER_ERROR_NONE)
-      Serial.println("sendtoWait failed");
+    if (manager.sendtoWait((uint8_t *)data, sizeof(data), from) != RH_ROUTER_ERROR_NONE) {
+      Serial.println("sendtoWait failed"); 
+      // led_state();
+    }
   }
   delay(1000);
 }
