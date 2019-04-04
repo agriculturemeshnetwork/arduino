@@ -14,6 +14,7 @@
 #include <RadioHead.h>
 #include <esp32-hal-cpu.h>
 #include <esp32-hal-i2c.h>
+#include <RHGenericDriver.h>
 
 // SCK pin = 18
 // MISO pin = 19
@@ -45,7 +46,7 @@ void setup()
   Serial.begin(115200);
   delay(100);
 
-  
+
   Serial.println("Begin MESH testing");
   // manual reset
   digitalWrite(RFM95_RST, LOW);
