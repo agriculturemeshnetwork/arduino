@@ -36,7 +36,7 @@ byte state = LOW;
 // Singleton instance of the radio driver
 RH_RF95 driver(RFM95_CS, RFM95_INT);
 
-RHMesh manager(driver, SERVER2_ADDRESS);
+RHMesh manager(driver, SERVER0_ADDRESS);
 
 
 void led_state(){
@@ -82,7 +82,7 @@ void setup()
 
 
 
-char data[] = "And hello back to you from server1";
+char data[] = "And hello back to you from server0";
 // Dont put this on the stack:
 uint8_t buf[RH_MESH_MAX_MESSAGE_LEN];
 void loop()
@@ -91,8 +91,17 @@ void loop()
   uint8_t len = sizeof(buf);
   uint8_t from;
 //  led_state();
+  /*if (manager.recvfrom(buf, &len, &from))
+  {
+	  Serial.print("got request from : 0x");
+	  Serial.print(from, HEX);
+	  Serial.print(": ");
+	  Serial.println((char*)buf);
+	  led_state();
 
-  if (manager.recvfromAck(buf, &len, &from))
+  }*/
+
+	  if (manager.recvfromAck(buf, &len, &from))
   {
     Serial.print("got request from : 0x");
     Serial.print(from, HEX);
@@ -106,6 +115,11 @@ void loop()
       // led_state();
     }
   }
+	  if (!(millis() % 1000))
+	  {
+		  Serial.println("routing table:");
+		  manager.printRoutingTable();
+	  }
   //delay(1000);
 }
 
