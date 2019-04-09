@@ -22,7 +22,7 @@
 // MOSI pin = 23
 
 #define RFM95_CS 2
-#define RFM95_RST 15
+#define RFM95_RST 0
 #define RFM95_INT 4
 
 // Change to 434.0 or other frequency, must match RX's freq!
