@@ -1,0 +1,25 @@
+create a working copy of a local repository by running the command
+git clone /path/to/repository
+when using a remote server, your command will be
+git clone username@host:/path/to/repository
+
+add & commit
+You can propose changes (add it to the Index) using
+git add <filename>
+git add *
+This is the first step in the basic git workflow. To actually commit these changes use
+git commit -m "Commit message"
+Now the file is committed to the HEAD, but not in your remote repository yet.
+
+pushing changes
+Your changes are now in the HEAD of your local working copy. To send those changes to your remote repository, execute 
+git push origin master
+Change master to whatever branch you want to push your changes to. 
+
+If you have not cloned an existing repository and want to connect your repository to a remote server, you need to add it with
+git remote add origin <server>
+Now you are able to push your changes to the selected remote server
+
+update & merge
+to update your local repository to the newest commit, execute 
+git pull
