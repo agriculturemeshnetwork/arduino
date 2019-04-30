@@ -184,7 +184,13 @@ for ( int TX_Count = 0 ; TX_Count < TX_Loop_Count ; TX_Count++) {
           } 
           //char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
         
-          //construct the new packet, in a really cringy way
+          //construct the new packet
+          char pnum[4];
+          sprintf(pnum, "%04lx", packetnum);
+          radiopacket[0] = pnum[0];
+          radiopacket[1] = pnum[1];
+          radiopacket[2] = pnum[2];
+          radiopacket[3] = pnum[3];
           //radiopacket[0] = packetnum;
           //radiopacket[1] = packetnum >> 8;
           //radiopacket[2] = packetnum >> 16;
@@ -226,7 +232,7 @@ for ( int TX_Count = 0 ; TX_Count < TX_Loop_Count ; TX_Count++) {
               rs = millis();
               
               
-              Serial.print((char*)buf); Serial.println(String(","+String(ts)+","+String(rs)));
+              Serial.print((char*)buf); Serial.println(String(","+String(rf95.lastRssi())+","+String(ts)+","+String(rs)));
     
                // successful transmission proves parameters for TX  reset TX fail counters
                BW_Fail = 0;
