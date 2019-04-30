@@ -26,11 +26,14 @@ String rx;
 //spreading factor definition (7 entries)
 uint8_t SF[] = {6, 7, 8, 9, 10, 11, 12};
 
+
+unsigned long wr = 0;  // wait reply, for resetting to long range signal
+
 //bandwidth definitions (10 entries)
 long BW[] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
 
 //transmit power definitions (5 entries)
-int TXP[] = {7, 13, 17, 20, 23};
+int TXP[] = {23, 20, 17, 13, 7};
 
 // SCK pin = 18
 // MISO pin = 19
@@ -87,15 +90,27 @@ void setup()
   // The default transmitter power is 13dBm, using PA_BOOST.
   // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then
   // you can set transmitter powers from 5 to 23 dBm:
-  rf95.setTxPower(TXP[4], false);
-  rf95.setSignalBandwidth(BW[9]);
-  rf95.setSpreadingFactor(SF[1]); // do we need a configuration delay? delay using a counter and millis() or delay()?
+  rf95.setTxPower(TXP[0], false);
+  rf95.setSignalBandwidth(BW[7]);
+  rf95.setSpreadingFactor(SF[1]);
 
 
 }
 
 void loop()
 {
+
+  //wait reply if statement. if more than a certain amount of time has passed, 
+  //set to longest range transmission setting. Other node also independently
+  //sets to longest range setting.
+  if((millis()-wr)>= 1000 ){
+    wr = millis();
+    Serial.println("No reply, switching to long range mode");
+    rf95.setTxPower(TXP[0], false);
+    rf95.setSignalBandwidth(BW[7]);
+    rf95.setSpreadingFactor(SF[1]);
+  }
+  
   if (rf95.available())
   {
     // Should be a message for us now
@@ -104,11 +119,14 @@ void loop()
 
     if (rf95.recv(buf, &len))
     {
-
+      //successful transmission; reset wait reply
+      wr = millis();
+      
       digitalWrite(LED, HIGH);
       RH_RF95::printBuffer("Received: ", buf, len);
       Serial.print("Got: ");
       Serial.println((char*)buf);
+      
       // begin deconstruction of message
       // char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
       //      int Counter = (buf[0]-48)*10000+(buf[1]-48)*1000+(buf[2]-48)*100+(buf[3]-48)*10+(buf[4]-48);
@@ -118,84 +136,8 @@ void loop()
       char Bandwidth[4] = {buf[10], buf[11], buf[12], '\0'};
       char SFactor[3] = {buf[14], buf[15], '\0'};
 
-      // begin switch statements for new transmission configurations
-      if ( Sender[0] = 'N' ) {
-        switch ( atoi(TXdB) ) { // transmit power switch {7, 13, 17, 20}
-          case '07':
-            rf95.setTxPower(TXP[0], false);
-            break;
-          case '13':
-            rf95.setTxPower(TXP[1], false);
-            break;
-          case '17':
-            rf95.setTxPower(TXP[2], false);
-            break;
-          case '20':
-            rf95.setTxPower(TXP[3], false);
-            break;
-          case '23':
-            rf95.setTxPower(TXP[4], false);
-            break;
-        }
-        switch (atoi(Bandwidth)) { // bandwidth switch {7.8, 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125, 250, 500};
-          case '500':
-              rf95.setSignalBandwidth(BW[9]);
-            break;
-          case '250':
-              rf95.setSignalBandwidth(BW[8]);
-            break;
-          case '125':
-              rf95.setSignalBandwidth(BW[7]);
-            break;
-          case '062':
-              rf95.setSignalBandwidth(BW[6]);
-            break;
-          case '041':
-              rf95.setSignalBandwidth(BW[5]);
-            break;
-          case '031':
-              rf95.setSignalBandwidth(BW[4]);
-            break;
-          case '020':
-              rf95.setSignalBandwidth(BW[3]);
-            break;
-          case '015':
-              rf95.setSignalBandwidth(BW[2]);
-            break;
-          case '010':
-              rf95.setSignalBandwidth(BW[1]);
-            break;
-          case '007':
-              rf95.setSignalBandwidth(BW[0]);
-            break;
-        }
-        switch (atoi(SFactor)) { // Spreading factor switch
-          case '06':
-              rf95.setSpreadingFactor(SF[0]);
-            break;
-          case '07':
-              rf95.setSpreadingFactor(SF[1]);
-            break;
-          case '08':
-              rf95.setSpreadingFactor(SF[2]);
-            break;
-          case '09':
-              rf95.setSpreadingFactor(SF[3]);
-            break;
-          case '10':
-              rf95.setSpreadingFactor(SF[4]);
-            break;
-          case '11':
-              rf95.setSpreadingFactor(SF[5]);
-            break;
-          case '12':
-              rf95.setSpreadingFactor(SF[6]);
-            break;
-        }
-      }
-
-
-      //      Serial.print("RSSI: ");
+      //immediately send reply
+      //Serial.print("RSSI: ");
       int lastRx = rf95.lastRssi();
       rx = String(lastRx);
       if  ( lastRx <= -100 ) rx = String(" " + rx);
@@ -208,6 +150,109 @@ void loop()
       rf95.waitPacketSent();
       //Serial.println("Sent a reply");
       digitalWrite(LED, LOW);
+      
+      // begin switch statements for new transmission configurations
+      if ( Sender[0] = 'N' ) {
+            //Serial.println("New configuration detected");
+            //Serial.println(String(atoi(TXdB)==23));
+        switch ( atoi(TXdB) ) { // transmit power switch {7, 13, 17, 20}
+          case 7:
+            rf95.setTxPower(TXP[0], false);
+            //Serial.print("TXdB is" + String(TXP[0]) + ", ");
+            break;
+          case 13:
+            rf95.setTxPower(TXP[1], false);
+            //Serial.print("TXdB is" + String(TXP[1]) + ", ");
+            break;
+          case 17:
+            rf95.setTxPower(TXP[2], false);
+            //Serial.print("TXdB is" + String(TXP[2]) + ", ");
+            break;
+          case 20:
+            rf95.setTxPower(TXP[3], false);
+            //Serial.print("TXdB is" + String(TXP[3]) + ", ");
+            break;
+          case 23:
+            rf95.setTxPower(TXP[4], false);
+            //Serial.print("TXdB is" + String(TXP[4]) + ", ");
+            break;
+        }
+        switch (atoi(Bandwidth)) { // bandwidth switch {7.8, 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125, 250, 500};
+          case 500:
+            rf95.setSignalBandwidth(BW[9]);
+            //Serial.print("BW is" + String(BW[9]) + ", ");
+            break;
+          case 250:
+            rf95.setSignalBandwidth(BW[8]);
+            //Serial.print("BW is" + String(BW[8]) + ", ");
+            break;
+          case 125:
+            rf95.setSignalBandwidth(BW[7]);
+            //Serial.print("BW is" + String(BW[7]) + ", ");
+            break;
+          case 62:
+            rf95.setSignalBandwidth(BW[6]);
+            //Serial.print("BW is" + String(BW[6]) + ", ");
+            break;
+          case 41:
+            rf95.setSignalBandwidth(BW[5]);
+            //Serial.print("BW is" + String(BW[5]) + ", ");
+            break;
+          case 31:
+            rf95.setSignalBandwidth(BW[4]);
+            //Serial.print("BW is" + String(BW[4]) + ", ");
+            break;
+          case 20:
+            rf95.setSignalBandwidth(BW[3]);
+            //Serial.print("BW is" + String(BW[3]) + ", ");
+            break;
+          case 15:
+            rf95.setSignalBandwidth(BW[2]);
+            //Serial.print("BW is" + String(BW[2]) + ", ");
+            break;
+          case 10:
+            rf95.setSignalBandwidth(BW[1]);
+            //Serial.print("BW is" + String(BW[1]) + ", ");
+            break;
+          case 7:
+            rf95.setSignalBandwidth(BW[0]);
+            //Serial.print("BW is" + String(BW[0]) + ", ");
+            break;
+        }
+        switch (atoi(SFactor)) { // Spreading factor switch
+          case 6:
+            rf95.setSpreadingFactor(SF[0]);
+            //Serial.println("SF is" + String(SF[0]));
+            break;
+          case 7:
+            rf95.setSpreadingFactor(SF[1]);
+            //Serial.println("SF is" + String(SF[1]));
+            break;
+          case 8:
+            rf95.setSpreadingFactor(SF[2]);
+            //Serial.println("SF is" + String(SF[2]));
+            break;
+          case 9:
+            rf95.setSpreadingFactor(SF[3]);
+            //Serial.println("SF is" + String(SF[3]));
+            break;
+          case 10:
+            rf95.setSpreadingFactor(SF[4]);
+            //Serial.println("SF is" + String(SF[4]));
+            break;
+          case 11:
+            rf95.setSpreadingFactor(SF[5]);
+            //Serial.println("SF is" + String(SF[5]));
+            break;
+          case 12:
+            rf95.setSpreadingFactor(SF[6]);
+            //Serial.println("SF is" + String(SF[6]));
+            break;
+        }
+      }
+
+
+      
     }
     else
     {
