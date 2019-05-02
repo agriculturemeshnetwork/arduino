@@ -41,7 +41,7 @@ volatile byte state = LOW;
 
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
-
+bool longRange = true;
 //spreading factor definition (7 entries)
 uint8_t SF[] = {6, 7, 8, 9, 10, 11, 12};
 char SF_Char[7][3] = {"06","07","08","09","10","11","12"};
@@ -49,7 +49,7 @@ char SF_Char[7][3] = {"06","07","08","09","10","11","12"};
 long BW[] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
 char BW_Char[10][4] = {"007","010","015","020","031","041","062","125","250","500"};
 //transmit power definitions (5 entries)
-int TXP[5] = {7, 13, 17, 20, 23};
+int TXP[5] = {23, 20, 17, 13, 7} ;
 char TXP_Char[5][3] = {"23","20","17","13","07"};
 
 int32_t packetnum = 1;  // packet counter, we increment per xmission
@@ -60,9 +60,7 @@ int TX_Fail = 0; // fail counters, breaks loops in case of transmissions increme
 int BW_Fail = 0; 
 int SF_Fail = 0; 
 
-int TX_Loop_Count = 5; // sizeof(TXP)/sizeof(TXP[0]); 
-int BW_Loop_Count = 10; // sizeof(BW)/sizeof(BW[0]);   
-int SF_Loop_Count = 7; // sizeof(SF)/sizeof(SF[0]);  
+int SF_Loop_Count = 5; //number of loops on one SF
 
 
 unsigned long ts = 0;  // time sent, for ping time
@@ -126,23 +124,25 @@ void loop(){
   String serialOut; // string to be displayed on serial output
   // start the transmit loop
 
-  if( a < sizeof(TXP)) {
-    for ( int i = 0 ; i < sizeof(BW)/sizeof(BW[0]) ; i++ ) {
-      for(int j = 0; j < sizeof(SF)/sizeof(SF[0]); j++) {
+  if( a < sizeof(TXP)/sizeof(TXP[0])) {
+    for ( int i = 7; i < sizeof(BW)/sizeof(BW[0]) ; i++ ) {
+      for(int j = 1; j < sizeof(SF)/sizeof(SF[0]); j++) {
 
         
           
-        for ( int k = 0 ; k < SF_Loop_Count + 1 ; ) {
+        for ( int k = 0 ; k < SF_Loop_Count + 1 ; k = k ) {
           
           // if this is the first transmission, send a reconfiguration packet
          if (k == 0) {
           radiopacket[5] = 'N';
             
-          if((millis()-rs)>= 1000 ){ // if no reply could be sent in 1000 millisecondss
-            //Serial.println("No reply, switching to long range mode");
+          if((millis()-rs)>= 1000 && !longRange){ // if no reply could be sent in 1000 millisecondss
+			rs = millis();
+            Serial.println("No reply, switching to long range mode");
             rf95.setTxPower(TXP[0], false); // change to long range mode
             rf95.setSignalBandwidth(BW[7]);
             rf95.setSpreadingFactor(SF[1]);
+			longRange = true;
           }
           //Serial.println("radio packet should be N next");
           }
@@ -152,25 +152,21 @@ void loop(){
           //Serial.println("radio packet should be S next");
           } 
           
-          char pnum[4];
-          sprintf(pnum, "%04lx", packetnum);
+          char pnum[20];
+          sprintf(pnum, "%04lx", packetnum++);
           
 
           radiopacket[0] = pnum[0];
           radiopacket[1] = pnum[1];
           radiopacket[2] = pnum[2];
           radiopacket[3] = pnum[3];
-          //radiopacket[0] = packetnum;
-          //radiopacket[1] = packetnum >> 8;
-          //radiopacket[2] = packetnum >> 16;
-          //radiopacket[3] = packetnum >> 24;
-          radiopacket[7] = TXP_Char[k][0];
-          radiopacket[8] = TXP_Char[k][1];
-          radiopacket[10] = BW_Char[j][0];
-          radiopacket[11] = BW_Char[j][1];
-          radiopacket[12] = BW_Char[j][2];
-          radiopacket[14] = SF_Char[k][0];
-          radiopacket[15] = SF_Char[k][1];
+          radiopacket[7] = TXP_Char[a][0];
+          radiopacket[8] = TXP_Char[a][1];
+          radiopacket[10] = BW_Char[i][0];
+          radiopacket[11] = BW_Char[i][1];
+          radiopacket[12] = BW_Char[i][2];
+          radiopacket[14] = SF_Char[j][0];
+          radiopacket[15] = SF_Char[j][1];
           
             /* packet is a vector of characters, a total of 22 bytes, and follows this structure:
             *  Each char is an ASCII character 
@@ -196,27 +192,41 @@ void loop(){
          // serialOut = String(radiopacket); // + "," + String(ts));
           //Serial.println(serialOut);
          
-          rf95.send((uint8_t *)radiopacket, 22 );
+          rf95.send((uint8_t *)radiopacket, sizeof(radiopacket)/sizeof(radiopacket[0]) );
           rf95.waitPacketSent();
       
           uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-          uint8_t len = sizeof(buf);
+          uint8_t len = sizeof(buf)/sizeof(buf[1])-1;
 
           if( radiopacket[5] == 'S' ) k++;
       
-          if (rf95.waitAvailableTimeout(100)) {
+          if (rf95.waitAvailableTimeout(4000)) {
             if (rf95.recv(buf, &len)) {
               rs = millis();
               if( radiopacket[5] == 'N' ) k++;
               Serial.print((char*)buf); Serial.println(String(","+String(ts)+","+String(rs)));
-
+			  if (!(radiopacket[5] == 'S'))
+			  {
+				  rf95.setSpreadingFactor(SF[j]);
+				  rf95.setSignalBandwidth(BW[i]);
+				  rf95.setTxPower(TXP[a], false);
+				  longRange = false;
+				  
+			  }
             } 
           }
         }
-        rf95.setSpreadingFactor(SF[j]);
+        
       }
-      rf95.setSignalBandwidth(BW[i]);
+      
     }
-    rf95.setTxPower(TXP[++a], false);
+
+    a++;
+    
   }
-}
+  else 
+  {
+	  Serial.println("test finished");
+	  while (1);
+  }
+ }
