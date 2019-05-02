@@ -106,8 +106,8 @@ void setup() {
   Serial.println("Initializing TX power to 23 dBm, bandwidth to 500kHz, and SF to 6");
   // rf95.setTxPower(23, false);
   rf95.setTxPower(TXP[0], false);
-  rf95.setSignalBandwidth(BW[0]);
-  rf95.setSpreadingFactor(SF[0]); // do we need a configuration delay? delay using a counter and millis() or delay()?
+  rf95.setSignalBandwidth(BW[7]);
+  rf95.setSpreadingFactor(SF[1]); // do we need a configuration delay? delay using a counter and millis() or delay()?
   radiopacket[22]=0;
 
   // begin transmit test code
@@ -127,16 +127,17 @@ void loop(){
   // start the transmit loop
 
   if( a < sizeof(TXP)) {
-    for ( int i = 0 ; i < sizeof(BW) ; i++ ) {
-      for(int j = 0; j < SF.length(); j++) {
+    for ( int i = 0 ; i < sizeof(BW)/sizeof(BW[0]) ; i++ ) {
+      for(int j = 0; j < sizeof(SF)/sizeof(SF[0]); j++) {
         for ( int k = 0 ; k < SF_Loop_Count ; k++ ) {
-
-
+      
           
 
 
           char pnum[4];
           sprintf(pnum, "%04lx", packetnum);
+          
+
           radiopacket[0] = pnum[0];
           radiopacket[1] = pnum[1];
           radiopacket[2] = pnum[2];
@@ -152,6 +153,7 @@ void loop(){
           radiopacket[12] = BW_Char[j][2];
           radiopacket[14] = SF_Char[k][0];
           radiopacket[15] = SF_Char[k][1];
+          
             /* packet is a vector of characters, a total of 22 bytes, and follows this structure:
             *  Each char is an ASCII character 
             PacketNumber is packet number (4 bytes)
@@ -171,9 +173,11 @@ void loop(){
       
             //Send transmission
           ts = millis(); // record time sent
-          serialOut = String(String(radiopacket)); // + "," + String(ts));
-          Serial.println(serialOut);
-          radiopacket[21] = 0;
+          Serial.println(radiopacket);
+           radiopacket[21] = 0;
+         // serialOut = String(radiopacket); // + "," + String(ts));
+          //Serial.println(serialOut);
+         
           rf95.send((uint8_t *)radiopacket, 22 );
           rf95.waitPacketSent();
       
