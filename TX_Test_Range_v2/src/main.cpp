@@ -129,11 +129,29 @@ void loop(){
   if( a < sizeof(TXP)) {
     for ( int i = 0 ; i < sizeof(BW)/sizeof(BW[0]) ; i++ ) {
       for(int j = 0; j < sizeof(SF)/sizeof(SF[0]); j++) {
-        for ( int k = 0 ; k < SF_Loop_Count ; k++ ) {
-      
+
+        
           
-
-
+        for ( int k = 0 ; k < SF_Loop_Count + 1 ; ) {
+          
+          // if this is the first transmission, send a reconfiguration packet
+         if (k == 0) {
+          radiopacket[5] = 'N';
+            
+          if((millis()-rs)>= 1000 ){ // if no reply could be sent in 1000 millisecondss
+            //Serial.println("No reply, switching to long range mode");
+            rf95.setTxPower(TXP[0], false); // change to long range mode
+            rf95.setSignalBandwidth(BW[7]);
+            rf95.setSpreadingFactor(SF[1]);
+          }
+          //Serial.println("radio packet should be N next");
+          }
+          // if not, send a regular packet
+          else{
+            radiopacket[5] = 'S';
+          //Serial.println("radio packet should be S next");
+          } 
+          
           char pnum[4];
           sprintf(pnum, "%04lx", packetnum);
           
@@ -183,11 +201,13 @@ void loop(){
       
           uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
           uint8_t len = sizeof(buf);
+
+          if( radiopacket[5] == 'S' ) k++;
       
           if (rf95.waitAvailableTimeout(100)) {
             if (rf95.recv(buf, &len)) {
               rs = millis();
-          
+              if( radiopacket[5] == 'N' ) k++;
               Serial.print((char*)buf); Serial.println(String(","+String(ts)+","+String(rs)));
 
             } 
