@@ -17,20 +17,20 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         #continuous saving the data in the txt file (everytime line 18 is excecuted the program emptry out the txt file)
         
         #windows
-        file =  open(os.environ['HOMEPATH']+"/test", "ab")
+        file =  open(os.environ['HOMEPATH']+"/range Test.txt", "ab")
         
         file.write((self.data))
         file.write(b'\n')
         file.close()
-        print("{} wrote:".format(self.client_address[0]))
-        print(self.data)
+        #print("{} wrote:".format(self.client_address[0]))
+        print(str(self.data))
 
 if __name__ == "__main__":
     HOST, PORT = "192.168.137.1", 6969
     print("Starting server......")
     # Create the server, binding to localhost on port 9999
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
-    print("here")
+ 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()

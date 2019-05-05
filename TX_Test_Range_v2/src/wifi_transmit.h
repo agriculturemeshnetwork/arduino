@@ -8,6 +8,7 @@ class wifi_transmit {
 public:
         bool init();
         bool send_message(String message);
+		bool flush(String message);
 };
 
 #endif

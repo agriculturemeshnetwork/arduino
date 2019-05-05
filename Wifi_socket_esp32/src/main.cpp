@@ -25,7 +25,4 @@ void loop() {
 
     test.send_message("hello world");
     delay(3000);
-
 }
-
-
