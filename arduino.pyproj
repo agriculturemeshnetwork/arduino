@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6d35cb32-58f2-486c-b410-30fcf2689025}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>wifi.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="wifi.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BluetoothSerial\platformio.ini" />
+    <Content Include="Client_mesh\platformio.ini" />
+    <Content Include="device_v1.0\platformio.ini" />
+    <Content Include="GPS_test\platformio.ini" />
+    <Content Include="RH-MESH_TEST_1\platformio.ini" />
+    <Content Include="RX_test\platformio.ini" />
+    <Content Include="sql_upload\platformio.ini" />
+    <Content Include="TX_test\platformio.ini" />
+    <Content Include="TX_Test_Range_v2\platformio.ini" />
+    <Content Include="Wifi_socket_esp32\platformio.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BluetoothSerial" />
+    <Folder Include="Client_mesh" />
+    <Folder Include="device_v1.0" />
+    <Folder Include="GPS_test" />
+    <Folder Include="RH-MESH_TEST_1" />
+    <Folder Include="RX_test" />
+    <Folder Include="sql_upload" />
+    <Folder Include="TX_test" />
+    <Folder Include="TX_Test_Range_v2" />
+    <Folder Include="Wifi_socket_esp32" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

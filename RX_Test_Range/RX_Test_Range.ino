@@ -133,7 +133,7 @@ void loop()
     SFactor[2] = '\0';
     rf95.setTxPower(TXP[TXP_DEFAULT], false);
     rf95.setSignalBandwidth(BW[BW_DEFAULT]);
-    rf95.setSpreadingFactor(SF[]);
+    rf95.setSpreadingFactor(SF[SF_DEFAULT]);
   }
   
   if (rf95.available())

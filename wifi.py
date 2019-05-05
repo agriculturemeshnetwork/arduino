@@ -1,5 +1,6 @@
 import socketserver
-import serial
+#import serial
+import os
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """
@@ -15,7 +16,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         
         #continuous saving the data in the txt file (everytime line 18 is excecuted the program emptry out the txt file)
         
-        file =  open("/home/pi/TCP_test/log.txt", "ab")
+        #windows
+        file =  open(os.environ['HOMEPATH']+"/test", "ab")
+        
         file.write((self.data))
         file.write(b'\n')
         file.close()
@@ -23,7 +26,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         print(self.data)
 
 if __name__ == "__main__":
-    HOST, PORT = "10.16.30.219", 6969
+    HOST, PORT = "192.168.137.1", 6969
     print("Starting server......")
     # Create the server, binding to localhost on port 9999
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)

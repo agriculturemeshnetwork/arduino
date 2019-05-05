@@ -22,6 +22,7 @@
 #include <esp32-hal-i2c.h>
 #include <RHGenericDriver.h>
 #include <RHGenericSPI.h>
+#include "wifi_transmit.h"
 
 // SCK pin = 18
 // MISO pin = 19
@@ -68,17 +69,17 @@ unsigned long rs = 0;  // time received, for ping time
 
 char radiopacket[23] = "0001,S,23,500,07,0000"; // first packet to be transmitted
   
-
+wifi_transmit Datasender;
 void setup() {
 
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
-  while (!Serial);
-  Serial.begin(115200);
+  //while (!Serial);
+  //Serial.begin(115200);
+  Datasender.init();
   delay(100);
-
-  Serial.println("Arduino LoRa TX Test!");
+  Datasender.send_message("Arduino LoRa TX Test!");
 
   // manual reset
   digitalWrite(RFM95_RST, LOW);
@@ -87,21 +88,21 @@ void setup() {
   delay(10);
 
   while (!rf95.init()) {
-    Serial.println("LoRa radio init failed");
+	  Datasender.send_message("LoRa radio init failed");
     while (1);
   }
-  Serial.println("LoRa radio init OK!");
+  Datasender.send_message("LoRa radio init OK!");
 
   // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
   if (!rf95.setFrequency(RF95_FREQ)) {
-    Serial.println("setFrequency failed");
+	  Datasender.send_message("setFrequency failed");
     while (1);
   }
 
-  Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+  Datasender.send_message(String("Set Freq to: ") +(RF95_FREQ));
 
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
-  Serial.println("Initializing TX power to 23 dBm, bandwidth to 500kHz, and SF to 6");
+  Datasender.send_message("Initializing TX power to 23 dBm, bandwidth to 500kHz, and SF to 6");
   // rf95.setTxPower(23, false);
   rf95.setTxPower(TXP[0], false);
   rf95.setSignalBandwidth(BW[7]);
@@ -113,7 +114,7 @@ void setup() {
   // char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
   //      int Counter = (buf[0]-48)*10000+(buf[1]-48)*1000+(buf[2]-48)*100+(buf[3]-48)*10+(buf[4]-48);
       
-  Serial.println("Beginning Transmit Test");
+  Datasender.send_message("Beginning Transmit Test");
   
 }
 
@@ -226,7 +227,7 @@ void loop(){
   }
   else 
   {
-	  Serial.println("test finished");
+	  Datasender.send_message("test finished");
 	  while (1);
   }
  }

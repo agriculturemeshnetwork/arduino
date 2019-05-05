@@ -1,4 +1,4 @@
-#include <wifi_transmit.h>
+#include "wifi_transmit.h"
 #include <Arduino.h>
 
 #define LED 5
@@ -16,11 +16,13 @@ void setup() {
     Serial.begin(111500);
     pinMode(LED, OUTPUT);    
     delay(3000);
-    Serial.print("Begin Test");
+	test.init();
+    Serial.print("Begin Test\n");
+	
 }
 
 void loop() {
-    led_state();
+
     test.send_message("hello world");
     delay(3000);
 
