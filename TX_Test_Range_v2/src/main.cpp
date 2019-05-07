@@ -64,7 +64,7 @@ int TX_Fail = 0; // fail counters, breaks loops in case of transmissions increme
 int BW_Fail = 0; 
 int SF_Fail = 0; 
 
-int SF_Loop_Count = 10; //number of loops on one SF
+int SF_Loop_Count = 4; //number of loops on one SF
 
 
 unsigned long ts = 0;  // time sent, for ping time
@@ -131,11 +131,11 @@ void loop(){
 
   if( a < sizeof(TXP)/sizeof(TXP[0])) {
     for ( int i = 7; i < sizeof(BW)/sizeof(BW[0]) ; i++ ) {
-      for(int j = 1; j < sizeof(SF)/sizeof(SF[0]); j++) {
+      for(int j = sizeof(SF) / sizeof(SF[0])-1; j > 0; j--) {
 
         
           
-        for ( int k = 0 ; k < SF_Loop_Count + 1 ; k = k ) {
+        for ( int k = 0 ; k < SF_Loop_Count + 1 ; ) {
           
           // if this is the first transmission, send a reconfiguration packet
          if (k == 0) {

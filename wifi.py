@@ -17,7 +17,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         #continuous saving the data in the txt file (everytime line 18 is excecuted the program emptry out the txt file)
         
         #windows
-        file =  open(os.environ['HOMEPATH']+"/range Test.txt", "ab")
+        file =  open(os.environ['HOMEPATH']+"/range Test 1m 2000m.txt", "ab")
         
         file.write((self.data))
         file.write(b'\n')

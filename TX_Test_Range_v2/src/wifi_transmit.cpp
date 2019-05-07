@@ -33,12 +33,11 @@ bool wifi_transmit::init() {
 
 bool wifi_transmit::send_message(String message) {
    
-	if (TCPbuffer.length() <1000)
+	
 	{
 		TCPbuffer = TCPbuffer + message+ "\r\n";
-		return true;
 	}
-	else {
+	if (TCPbuffer.length() > 1000) {
 		// Use WiFiClient class to create TCP connections
 		WiFiClient client;
 		const int httpPort = 6969;
