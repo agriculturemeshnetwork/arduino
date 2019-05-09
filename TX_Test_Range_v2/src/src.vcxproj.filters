@@ -21,9 +21,15 @@
     <ClInclude Include="__vm\.src.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="wifi_transmit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="wifi_transmit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

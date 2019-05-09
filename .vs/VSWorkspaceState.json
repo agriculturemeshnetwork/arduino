@@ -1,8 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\RH-MESH_TEST_1"
+    "\\RH-MESH_TEST_1",
+    "\\Wifi_socket_esp32",
+    "\\Wifi_socket_esp32\\src"
   ],
-  "SelectedNode": "\\RH-MESH_TEST_1\\Mesh_Test_1.ino",
+  "SelectedNode": "\\Wifi_socket_esp32\\src\\main.cpp",
   "PreviewInSolutionExplorer": false
 }

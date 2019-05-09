@@ -1,8 +1,8 @@
 #ifndef wifi_transmit_h
 #define wifi_transmit_h
 
-#include <WiFi.h>
-#include <string.h>
+#include "WiFi.h"
+#include <string>
 
 class wifi_transmit {
 public:

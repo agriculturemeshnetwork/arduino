@@ -22,6 +22,7 @@
 #include <esp32-hal-i2c.h>
 #include <RHGenericDriver.h>
 #include <RHGenericSPI.h>
+#include "wifi_transmit.h"
 
 // SCK pin = 18
 // MISO pin = 19
@@ -44,12 +45,15 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 bool longRange = true;
 //spreading factor definition (7 entries)
 uint8_t SF[] = {6, 7, 8, 9, 10, 11, 12};
+#define SF_DEFAULT 6
 char SF_Char[7][3] = {"06","07","08","09","10","11","12"};
 //bandwidth definitions (10 entries)
 long BW[] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
+#define BW_DEFAULT 9
 char BW_Char[10][4] = {"007","010","015","020","031","041","062","125","250","500"};
 //transmit power definitions (5 entries)
 int TXP[5] = {23, 20, 17, 13, 7} ;
+#define TXP_DEFAULT 0
 char TXP_Char[5][3] = {"23","20","17","13","07"};
 
 int32_t packetnum = 1;  // packet counter, we increment per xmission
@@ -60,7 +64,7 @@ int TX_Fail = 0; // fail counters, breaks loops in case of transmissions increme
 int BW_Fail = 0; 
 int SF_Fail = 0; 
 
-int SF_Loop_Count = 5; //number of loops on one SF
+int SF_Loop_Count = 10; //number of loops on one SF
 
 
 unsigned long ts = 0;  // time sent, for ping time
@@ -68,17 +72,17 @@ unsigned long rs = 0;  // time received, for ping time
 
 char radiopacket[23] = "0001,S,23,500,07,0000"; // first packet to be transmitted
   
-
+wifi_transmit Datasender;
 void setup() {
 
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
-  while (!Serial);
-  Serial.begin(115200);
+  //while (!Serial);
+  //Serial.begin(115200);
+  Datasender.init();
   delay(100);
-
-  Serial.println("Arduino LoRa TX Test!");
+  Datasender.send_message("Arduino LoRa TX Test!");
 
   // manual reset
   digitalWrite(RFM95_RST, LOW);
@@ -87,25 +91,26 @@ void setup() {
   delay(10);
 
   while (!rf95.init()) {
-    Serial.println("LoRa radio init failed");
+	  Datasender.send_message("LoRa radio init failed");
     while (1);
   }
-  Serial.println("LoRa radio init OK!");
+  Datasender.send_message("LoRa radio init OK!");
 
   // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
   if (!rf95.setFrequency(RF95_FREQ)) {
-    Serial.println("setFrequency failed");
+	  Datasender.send_message("setFrequency failed");
     while (1);
   }
 
-  Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+  Datasender.send_message(String("Set Freq to: ") +(RF95_FREQ));
 
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
-  Serial.println("Initializing TX power to 23 dBm, bandwidth to 500kHz, and SF to 6");
+  Datasender.send_message("Initializing TX power to 23 dBm, bandwidth to 500kHz, and SF to 6");
   // rf95.setTxPower(23, false);
-  rf95.setTxPower(TXP[0], false);
-  rf95.setSignalBandwidth(BW[7]);
-  rf95.setSpreadingFactor(SF[1]); // do we need a configuration delay? delay using a counter and millis() or delay()?
+  longRange = true;
+  rf95.setTxPower(TXP[TXP_DEFAULT], false);
+  rf95.setSignalBandwidth(BW[BW_DEFAULT]);
+  rf95.setSpreadingFactor(SF[SF_DEFAULT]); // do we need a configuration delay? delay using a counter and millis() or delay()?
   radiopacket[22]=0;
 
   // begin transmit test code
@@ -113,7 +118,7 @@ void setup() {
   // char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
   //      int Counter = (buf[0]-48)*10000+(buf[1]-48)*1000+(buf[2]-48)*100+(buf[3]-48)*10+(buf[4]-48);
       
-  Serial.println("Beginning Transmit Test");
+  Datasender.send_message("Beginning Transmit Test");
   
 }
 
@@ -138,18 +143,18 @@ void loop(){
             
           if((millis()-rs)>= 1000 && !longRange){ // if no reply could be sent in 1000 millisecondss
 			rs = millis();
-            Serial.println("No reply, switching to long range mode");
-            rf95.setTxPower(TXP[0], false); // change to long range mode
-            rf95.setSignalBandwidth(BW[7]);
-            rf95.setSpreadingFactor(SF[1]);
+            Datasender.send_message("No reply, switching to long range mode");
+            rf95.setTxPower(TXP[TXP_DEFAULT], false); // change to long range mode
+            rf95.setSignalBandwidth(BW[BW_DEFAULT]);
+            rf95.setSpreadingFactor(SF[SF_DEFAULT]);
 			longRange = true;
           }
-          //Serial.println("radio packet should be N next");
+          //Datasender.send_message("radio packet should be N next");
           }
           // if not, send a regular packet
           else{
             radiopacket[5] = 'S';
-          //Serial.println("radio packet should be S next");
+          //Datasender.send_message("radio packet should be S next");
           } 
           
           char pnum[20];
@@ -187,10 +192,10 @@ void loop(){
       
             //Send transmission
           ts = millis(); // record time sent
-          Serial.println(radiopacket);
+          Datasender.send_message(radiopacket);
            radiopacket[21] = 0;
          // serialOut = String(radiopacket); // + "," + String(ts));
-          //Serial.println(serialOut);
+          //Datasender.send_message(serialOut);
          
           rf95.send((uint8_t *)radiopacket, sizeof(radiopacket)/sizeof(radiopacket[0]) );
           rf95.waitPacketSent();
@@ -204,7 +209,7 @@ void loop(){
             if (rf95.recv(buf, &len)) {
               rs = millis();
               if( radiopacket[5] == 'N' ) k++;
-              Serial.print((char*)buf); Serial.println(String(","+String(ts)+","+String(rs)));
+              Datasender.send_message(String((char*)buf)+rf95.lastRssi()+","+(String(","+String(ts)+","+String(rs))));
 			  if (!(radiopacket[5] == 'S'))
 			  {
 				  rf95.setSpreadingFactor(SF[j]);
@@ -226,7 +231,7 @@ void loop(){
   }
   else 
   {
-	  Serial.println("test finished");
+	  Datasender.flush("test finished");
 	  while (1);
   }
  }
