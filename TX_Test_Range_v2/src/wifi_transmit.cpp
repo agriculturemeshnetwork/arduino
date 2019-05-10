@@ -1,5 +1,5 @@
 #include "wifi_transmit.h"
-
+#ifdef WIFI_TRANSMIT_TRUE
 const char* ssid     = "testSenior";
 const char* password = "JustAnotherPass";
 int nodeNumber = 0;
@@ -96,3 +96,23 @@ bool wifi_transmit::flush(String message) {
 		return true;
 	}
 }
+#else 
+
+bool wifi_transmit::init() {
+    Serial.begin(115200);
+    
+    }
+
+  
+
+
+
+bool wifi_transmit::send_message(String message) {
+   
+  Serial.println(message);
+  
+}
+bool wifi_transmit::flush(String message) {
+  Serial.println(message);
+}
+#endif
