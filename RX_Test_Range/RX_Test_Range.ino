@@ -58,7 +58,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 char TXdB[3] = {'2','3', '\0'};
 char Bandwidth[4] = {'1','2','5', '\0'};
-char SFactor[3] = {'0','7','\0'};
+char SFactor[3] = {'1','2','\0'};
 char Counter[5];
 char Sender[2];
 
@@ -128,8 +128,8 @@ void loop()
     Bandwidth[1] = '2';
     Bandwidth[2] = '5';
     Bandwidth[3] = '\0';
-    SFactor[0] = '0';
-    SFactor[1] = '7';
+    SFactor[0] = '1';
+    SFactor[1] = '2';
     SFactor[2] = '\0';
     rf95.setTxPower(TXP[TXP_DEFAULT], false);
     rf95.setSignalBandwidth(BW[BW_DEFAULT]);
