@@ -12,7 +12,7 @@
 // are transmit power, bandwidth, and spreading factor.
 // I borrowed heavily for this code, but it is authored by
 // Aric Gerspacher
-#define WIFI_TRANSMIT_TRUE
+
 #include <Arduino.h>
 #include <SPI.h>
 #include <RH_RF95.h>
@@ -57,6 +57,7 @@ long BW[] ={125000, 250000, 500000};
 char BW_Char[][4] = {"125","250","500"};
 //transmit power definitions (5 entries)
 int TXP[] = {23, 20, 17, 13, 7} ;
+
 #define TXP_DEFAULT 0
 char TXP_Char[][3] = {"23","20","17","13","07"};
 
@@ -132,12 +133,11 @@ void loop(){
 
   String serialOut; // string to be displayed on serial output
   // start the transmit loop
-
+  
   if( TXPTest < sizeof(TXP)/sizeof(TXP[0])) {
-    for ( int bandwidthTest = 7; bandwidthTest < sizeof(BW)/sizeof(BW[0]) ; bandwidthTest++ ) {
+    for ( int bandwidthTest = 0; bandwidthTest < sizeof(BW)/sizeof(BW[0]) ; bandwidthTest++ ) {
       for(int spreadingFactorTest = sizeof(SF) / sizeof(SF[0])-1; spreadingFactorTest > 0; spreadingFactorTest--) {
         for ( int TestNumber = 0 ; TestNumber < SF_Loop_Count + 1 ; ) {
-          
           // if this is the first transmission, send a reconfiguration packet
          if (TestNumber == 0) {
           radiopacket[5] = 'N';

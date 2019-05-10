@@ -182,4 +182,5 @@ C:\Users\Spencer\AppData\Local\Temp\VMBuilds\src\esp32_esp32thing\Debug\wifi_tra
  C:\Users\Spencer\AppData\Local\arduino15\packages\esp32\hardware\esp32\1.0.1\cores\esp32/Server.h \
  C:\Users\Spencer\AppData\Local\arduino15\packages\esp32\hardware\esp32\1.0.1\libraries\WiFi\src/WiFiUdp.h \
  C:\Users\Spencer\AppData\Local\arduino15\packages\esp32\hardware\esp32\1.0.1\cores\esp32/Udp.h \
- C:\Users\Spencer\AppData\Local\arduino15\packages\esp32\hardware\esp32\1.0.1\cores\esp32/cbuf.h
+ C:\Users\Spencer\AppData\Local\arduino15\packages\esp32\hardware\esp32\1.0.1\cores\esp32/cbuf.h \
+ C:\Users\Spencer\AppData\Local\Temp\VMBuilds\src\esp32_esp32thing\Debug\Def.h

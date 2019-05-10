@@ -1,4 +1,6 @@
 #include "wifi_transmit.h"
+#include "Def.h"
+
 #ifdef WIFI_TRANSMIT_TRUE
 const char* ssid     = "testSenior";
 const char* password = "JustAnotherPass";
