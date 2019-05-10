@@ -116,7 +116,7 @@ void loop()
   if(((millis()-wr)>= 20000 ) && !longRange){
     //wr = millis();
     longRange = true;
-    Serial.println("No message received in 2 second, resetting");
+    Serial.println("No message received in 20 second, resetting");
    // ESP.restart();
     Serial.print("previous setting:");
     serialOut = String(String(Counter) + ",R," + String(TXdB) + "," + String(Bandwidth) + "," + String(SFactor) + "," + rx);
@@ -153,7 +153,7 @@ void loop()
       Serial.println((char*)buf);
       
       // begin deconstruction of message
-      // char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
+      // char radiopacket[22] = "0001,N,12,125,0000"; is the first packet to be transmitted
       //      int Counter = (buf[0]-48)*10000+(buf[1]-48)*1000+(buf[2]-48)*100+(buf[3]-48)*10+(buf[4]-48);
       
       Counter[0] = buf[0];
@@ -168,7 +168,11 @@ void loop()
       int lastRx = rf95.lastRssi();
       rx = String(lastRx);
       if  ( lastRx <= -100 ) rx = String(" " + rx);
-      serialOut = String(String(Counter) + ",R," + String(TXdB) + "," + String(Bandwidth) + "," + String(SFactor) + "," + rx);
+      String replyConfirm = "   ";
+      if( Sender[0]=='N' ) replyConfirm = ",C,";
+      else replyConfirm = ",R,";
+      
+      serialOut = String(String(Counter) + replyConfirm + String(TXdB) + "," + String(Bandwidth) + "," + String(SFactor) + "," + rx);
       Serial.println(serialOut);  
       char radioPacket[serialOut.length()];  
       strcpy(radioPacket, serialOut.c_str());  
