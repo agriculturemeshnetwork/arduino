@@ -25,18 +25,18 @@ String serialOut;
 String rx;
 //spreading factor definition (7 entries)
 uint8_t SF[] = {6, 7, 8, 9, 10, 11, 12};
-#define SF_DEFAULT 6
+#define SF_DEFAULT 6 //sp = 12
 
 
 unsigned long wr = 0;  // wait reply, for resetting to long range signal
 
 //bandwidth definitions (10 entries)
 long BW[] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
-#define BW_DEFAULT 9
+#define BW_DEFAULT 7 //bw = 125k
 
 //transmit power definitions (5 entries)
 int TXP[] = {23, 20, 17, 13, 7};
-#define TXP_DEFAULT 0
+#define TXP_DEFAULT 0 //txp = 23
 
 // SCK pin = 18
 // MISO pin = 19

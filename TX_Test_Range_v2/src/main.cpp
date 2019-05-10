@@ -210,7 +210,7 @@ void loop(){
             if (rf95.recv(buf, &len)) {
               rs = millis();
               if( radiopacket[5] == 'N' ) TestNumber++;
-              Datasender.send_message(String((char*)buf)+rf95.lastRssi()+","+(String(","+String(ts)+","+String(rs))));
+              Datasender.send_message(String((char*)buf) + "," +rf95.lastRssi()+(String(","+String(ts)+","+String(rs))));
 			  if (!(radiopacket[5] == 'S'))
 			  {
 				  rf95.setSpreadingFactor(SF[spreadingFactorTest]);
