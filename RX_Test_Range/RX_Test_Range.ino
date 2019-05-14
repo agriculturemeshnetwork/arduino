@@ -25,18 +25,18 @@ String serialOut;
 String rx;
 //spreading factor definition (7 entries)
 uint8_t SF[] = {6, 7, 8, 9, 10, 11, 12};
-#define SF_DEFAULT 6
+#define SF_DEFAULT 6 //sp = 12
 
 
 unsigned long wr = 0;  // wait reply, for resetting to long range signal
 
 //bandwidth definitions (10 entries)
 long BW[] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
-#define BW_DEFAULT 9
+#define BW_DEFAULT 7 //bw = 125k
 
 //transmit power definitions (5 entries)
 int TXP[] = {23, 20, 17, 13, 7};
-#define TXP_DEFAULT 0
+#define TXP_DEFAULT 0 //txp = 23
 
 // SCK pin = 18
 // MISO pin = 19
@@ -58,7 +58,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 char TXdB[3] = {'2','3', '\0'};
 char Bandwidth[4] = {'1','2','5', '\0'};
-char SFactor[3] = {'0','7','\0'};
+char SFactor[3] = {'1','2','\0'};
 char Counter[5];
 char Sender[2];
 
@@ -116,7 +116,7 @@ void loop()
   if(((millis()-wr)>= 20000 ) && !longRange){
     //wr = millis();
     longRange = true;
-    Serial.println("No message received in 2 second, resetting");
+    Serial.println("No message received in 20 second, resetting");
    // ESP.restart();
     Serial.print("previous setting:");
     serialOut = String(String(Counter) + ",R," + String(TXdB) + "," + String(Bandwidth) + "," + String(SFactor) + "," + rx);
@@ -128,8 +128,8 @@ void loop()
     Bandwidth[1] = '2';
     Bandwidth[2] = '5';
     Bandwidth[3] = '\0';
-    SFactor[0] = '0';
-    SFactor[1] = '7';
+    SFactor[0] = '1';
+    SFactor[1] = '2';
     SFactor[2] = '\0';
     rf95.setTxPower(TXP[TXP_DEFAULT], false);
     rf95.setSignalBandwidth(BW[BW_DEFAULT]);
@@ -153,7 +153,7 @@ void loop()
       Serial.println((char*)buf);
       
       // begin deconstruction of message
-      // char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
+      // char radiopacket[22] = "0001,N,12,125,0000"; is the first packet to be transmitted
       //      int Counter = (buf[0]-48)*10000+(buf[1]-48)*1000+(buf[2]-48)*100+(buf[3]-48)*10+(buf[4]-48);
       
       Counter[0] = buf[0];
@@ -168,7 +168,11 @@ void loop()
       int lastRx = rf95.lastRssi();
       rx = String(lastRx);
       if  ( lastRx <= -100 ) rx = String(" " + rx);
-      serialOut = String(String(Counter) + ",R," + String(TXdB) + "," + String(Bandwidth) + "," + String(SFactor) + "," + rx);
+      String replyConfirm = "   ";
+      if( Sender[0]=='N' ) replyConfirm = ",C,";
+      else replyConfirm = ",R,";
+      
+      serialOut = String(String(Counter) + replyConfirm + String(TXdB) + "," + String(Bandwidth) + "," + String(SFactor) + "," + rx);
       Serial.println(serialOut);  
       char radioPacket[serialOut.length()];  
       strcpy(radioPacket, serialOut.c_str());  
