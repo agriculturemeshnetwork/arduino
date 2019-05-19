@@ -1,15 +1,6 @@
 // LoRa 9x_TX_Rangetest
 // -*- mode: C++ -*-
-// This sketch pings another LoRa module through the all of
-// spreading factor, bandwidth and transmission power options,
-// and reports signal strength, transmit and receive strengths.
-// This sketch is transmitter part of a pair of transmit test 
-// (the other is the sender 'RX_Test_Range') for checking a range
-// of LoRa parameters and a signal strength (RSSI)
-// measurement. This code reply's the RSSI of a transmitted 
-// signal and changes LoRa transmission configurations
-// when prompted by the sender. The configuration parameters
-// are transmit power, bandwidth, and spreading factor.
+// This sketch checks battery level and transmits it to another node for display.
 // I borrowed heavily for this code from Radiohead, but it is authored by
 // Aric Gerspacher
 
@@ -38,6 +29,20 @@
 /* LED pin */
 int led = 5;
 /* LED state */
+
+// ADC pins
+
+int sensor3_2 = 25;
+int sensor3_3 = 35; //input only
+int sensor3_4 = 34; //input only
+
+int sensor4_1 = 26;
+int sensor4_2 = 27;
+int sensor4_3 = 14;
+
+int sensor_b = 13;
+
+
 volatile byte state = LOW;
 
 // Singleton instance of the radio driver
@@ -83,6 +88,9 @@ void setup() {
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
+  //initialize ADC pins
+  pinMode(sensor_b, INPUT);
+    
   //while (!Serial);
   //Serial.begin(115200);
   Datasender.init();
@@ -116,24 +124,29 @@ void setup() {
   rf95.setTxPower(TXP[TXP_DEFAULT], false);
   rf95.setSignalBandwidth(BW[BW_DEFAULT]);
   rf95.setSpreadingFactor(SF[SF_DEFAULT]); // do we need a configuration delay? delay using a counter and millis() or delay()?
-  radiopacket[22]=0;
+  // radiopacket[22]=0;
 
   // begin transmit test code
   // begin deconstruction of message
   // char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
   //      int Counter = (buf[0]-48)*10000+(buf[1]-48)*1000+(buf[2]-48)*100+(buf[3]-48)*10+(buf[4]-48);
       
-  Datasender.send_message("Beginning Transmit Test");
+  // Datasender.send_message("Beginning Transmit Test");
+
   
 }
 
-int TX_Count = 0;
-int TXPTest = 0;
 void loop(){
-
-  String serialOut; // string to be displayed on serial output
-  // start the transmit loop
   
+  unsigned long wr = millis();
+
+  String serialOut = String(analogRead(sensor_b)*3.3/1023); // string to be displayed on serial output
+
+  Serial.println(serialOut);
+
+  while( wr + 1000 > millis()){}
+
+  /*
   if( TXPTest < sizeof(TXP)/sizeof(TXP[0])) {
     for ( int bandwidthTest = 0; bandwidthTest < sizeof(BW)/sizeof(BW[0]) ; bandwidthTest++ ) {
       for(int spreadingFactorTest = sizeof(SF) / sizeof(SF[0])-1; spreadingFactorTest > 0; spreadingFactorTest--) {
@@ -173,6 +186,7 @@ void loop(){
           radiopacket[12] = BW_Char[bandwidthTest][2];
           radiopacket[14] = SF_Char[spreadingFactorTest][0];
           radiopacket[15] = SF_Char[spreadingFactorTest][1];
+          */
           
             /* packet is a vector of characters, a total of 22 bytes, and follows this structure:
             *  Each char is an ASCII character 
@@ -192,6 +206,7 @@ void loop(){
             // char radiopacket[22] = "0001,N,07,500,06,0000"; is the first packet to be transmitted
       
             //Send transmission
+            /*
           ts = millis(); // record time sent
           Datasender.send_message(radiopacket);
            radiopacket[21] = 0;
@@ -235,4 +250,5 @@ void loop(){
 	  Datasender.flush("test finished");
 	  while (1);
   }
+  */
  }
