@@ -193,7 +193,7 @@ void loop(){
       
             //Send transmission
           ts = millis(); // record time sent
-          Datasender.send_message(radiopacket);
+          //Datasender.send_message(radiopacket);
            radiopacket[21] = 0;
          // serialOut = String(radiopacket); // + "," + String(ts));
           //Datasender.send_message(serialOut);
@@ -210,16 +210,21 @@ void loop(){
             if (rf95.recv(buf, &len)) {
               rs = millis();
               if( radiopacket[5] == 'N' ) TestNumber++;
-              Datasender.send_message(String((char*)buf) + "," +rf95.lastRssi()+(String(","+String(ts)+","+String(rs))));
-			  if (!(radiopacket[5] == 'S'))
-			  {
+              
+                Datasender.send_message(String((char*)buf) + "," +rf95.lastRssi()+(String(","+String(ts)+","+String(rs))));
+            
+                if (!(radiopacket[5] == 'S'))
+                {
 				  rf95.setSpreadingFactor(SF[spreadingFactorTest]);
 				  rf95.setSignalBandwidth(BW[bandwidthTest]);
 				  rf95.setTxPower(TXP[TXPTest], false);
 				  longRange = false;
 				  
 			  }
-            } 
+            } else {
+                //Print this if there is never a reply back from the RX
+                Datasender.send_message(String((char*)buf)+ ",FAIL");
+            }
           }
         }
         
