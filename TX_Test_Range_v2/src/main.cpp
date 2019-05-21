@@ -193,7 +193,7 @@ void loop(){
       
             //Send transmission
           ts = millis(); // record time sent
-          //Datasender.send_message(radiopacket);
+          Datasender.send_message(radiopacket);
            radiopacket[21] = 0;
          // serialOut = String(radiopacket); // + "," + String(ts));
           //Datasender.send_message(serialOut);
