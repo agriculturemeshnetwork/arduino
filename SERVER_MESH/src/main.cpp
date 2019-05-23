@@ -81,9 +81,6 @@ void setup()
 
 }
 
-
-
-
 char data[] = "And hello back to you from server1";
 // Dont put this on the stack:
 uint8_t buf[RH_MESH_MAX_MESSAGE_LEN];
@@ -108,5 +105,5 @@ void loop()
       // led_state();
     }
   }
-  //delay(1000);
+ 
 }

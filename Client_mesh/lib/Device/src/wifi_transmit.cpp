@@ -2,7 +2,7 @@
 #include "Def.h"
 
 #ifdef WIFI_TRANSMIT_TRUE
-const char* ssid     = "testSenior";
+const char* ssid     = "TestSenior";
 const char* password = "JustAnotherTest";
 int nodeNumber = 0;
 double temp = 0;
@@ -27,6 +27,7 @@ bool wifi_transmit::init() {
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
+				Serial.println("still attempting connection");
     }
 
   

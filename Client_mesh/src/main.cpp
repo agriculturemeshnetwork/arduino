@@ -49,16 +49,15 @@ void led_state(){
 
 void setup() 
 {
-  delay(4000);
+  //delay(4000);
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
   pinMode(led, OUTPUT);
-
+  Serial.begin(115200);
+  Serial.println("begin wifi init");
   wyfy.init();
 
-  while (!Serial);
-  Serial.begin(115200);
-  delay(4000);
+  
 
 
   Serial.println("Begin MESH testing");
@@ -108,7 +107,7 @@ void loop()
     uint8_t from;  
     
     //if(manager.recvfromAck(buf, &len, &from))
-    if (manager.recvfromAckTimeout(buf, &len, 500, &from))
+    if (manager.recvfromAckTimeout(buf, &len, 1000, &from))
     {
       Serial.print("got reply from : 0x");
       Serial.print(from, HEX);

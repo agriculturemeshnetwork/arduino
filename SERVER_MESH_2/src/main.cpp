@@ -17,9 +17,9 @@
 #include <esp32-hal-i2c.h>
 #include <RHGenericDriver.h>
 #include <RHGenericSPI.h>
-#include <tempSensor.h>
 #include <moisture.h>
-#include <ArduinoJson.h>
+#include "tempSensor.h"
+#include "ArduinoJson.h"
 #include <WiFi.h>
 
 
@@ -31,13 +31,13 @@
 #define RFM95_RST 0
 #define RFM95_INT 4
 
-#define temp_ADC 3 
-#define temp_High 4
-#define temp_LOW  4
+#define temp_ADC 27 
+#define temp_High 26
+#define temp_LOW  14
 
-#define moist_ADC 3
-#define moist_High 4
-#define moist_LOW  4
+#define moist_ADC 35
+#define moist_High 25
+#define moist_LOW  34
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 915.0
@@ -100,19 +100,27 @@ void setup()
 char data[RH_MESH_MAX_MESSAGE_LEN];
 // Dont put this on the stack:
 uint8_t buf[RH_MESH_MAX_MESSAGE_LEN];
+
+long waitFor = 0;
 void loop()
-{
-  //Serial.println("Aloha FUNT");
+{ 
   uint8_t len = sizeof(buf);
   uint8_t from;
-//  led_state();
+  if(waitFor == 0||millis()-waitFor==30000)
+  {
+    waitFor = millis();
     String json_string;
-    
     doc["Tempature: "] = Temp.get_temp();
     doc["Moisture: "] =  Moist.get_moisture();
 
     serializeJson(doc, json_string);
     strcpy(data, json_string.c_str());
+  }
+  //Serial.println("Aloha FUNT");
+ 
+//  led_state();
+    
+    
 
   if (manager.recvfromAck(buf, &len, &from))
   {

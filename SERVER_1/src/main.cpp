@@ -54,7 +54,7 @@ void setup()
 
   while (!Serial);
   Serial.begin(115200);
-  delay(4000);
+  delay(1000);
 
 
   Serial.println("Begin MESH testing");

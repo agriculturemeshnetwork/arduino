@@ -32,16 +32,16 @@ float MoistureSensor::get_moisture() {
     digitalWrite(high, 0);
     
     
-    Serial.print("VOLTAGE: "); 
-    Serial.println(voltage_in);
-    Serial.print("VOLTAGE RATIO: "); 
+    //Serial.print("VOLTAGE: "); 
+    //Serial.println(voltage_in);
+    //Serial.print("VOLTAGE RATIO: "); 
     float voltageRatio = float(4095)/float(voltage_in);
-    Serial.println(voltageRatio);
+    //Serial.println(voltageRatio);
     
     resistance = (voltageRatio  - 1) * resistor;
 
-    Serial.print("RESISTANCE: ");
-    Serial.println(resistance);
+    //Serial.print("RESISTANCE: ");
+    //Serial.println(resistance);
     
     if ( resistance < 600 ) {
       cb = 0;
@@ -54,8 +54,8 @@ float MoistureSensor::get_moisture() {
     }
     
     
-    Serial.print("Centibars: "); 
-    Serial.println(cb);
+    //Serial.print("Centibars: "); 
+    //Serial.println(cb);
     
     wr = micros() + long_delay;
     while (micros() < wr){}
