@@ -16,6 +16,7 @@
 #include <esp32-hal-i2c.h>
 #include <RHGenericDriver.h>
 #include <RHGenericSPI.h>
+#include <wifi_transmit.h>
 
 
 // SCK pin = 18
@@ -39,6 +40,7 @@ RH_RF95 driver(RFM95_CS, RFM95_INT);
 
 RHMesh manager(driver, CLIENT_ADDRESS);
 
+wifi_transmit wyfy;
 
 void led_state(){
   state = !state;
@@ -47,9 +49,12 @@ void led_state(){
 
 void setup() 
 {
+  delay(4000);
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
   pinMode(led, OUTPUT);
+
+  wyfy.init();
 
   while (!Serial);
   Serial.begin(115200);
@@ -90,7 +95,7 @@ uint8_t buf[RH_MESH_MAX_MESSAGE_LEN];
 
 void loop()
 {
-  Serial.println("Sending to manager_mesh_server2");
+  Serial.println("Sending to Server 2");
   // led_state();  
   // Send a message to a rf22_mesh_server
   // A route to the destination will be automatically discovered.
@@ -98,23 +103,30 @@ void loop()
   {
     // It has been reliably delivered to the next node.
     // Now wait for a reply from the ultimate server
+    
     uint8_t len = sizeof(buf);
-    uint8_t from;    
-    if (manager.recvfromAckTimeout(buf, &len, 3000, &from))
+    uint8_t from;  
+    
+    //if(manager.recvfromAck(buf, &len, &from))
+    if (manager.recvfromAckTimeout(buf, &len, 500, &from))
     {
       Serial.print("got reply from : 0x");
       Serial.print(from, HEX);
       Serial.print(": ");
       Serial.println((char*)buf);
-      led_state(); 
+      //led_state(); 
+      String message = (char*)buf;
+      
+      wyfy.send_message(message);
     }
     else
     {
-      Serial.println("No reply, is rf22_mesh_server0, rf22_mesh_server1 and rf22_mesh_server2 running?");
+      Serial.println("No reply, is rf95_mesh_server0, rf95_mesh_server1 and rf95_mesh_server2 running?");
     }
+    
   }
   else
      Serial.println("sendtoWait failed. Are the intermediate mesh servers running?");
   
-  delay(1000);
+  //delay(1000);
 }
