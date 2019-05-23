@@ -1,9 +1,15 @@
 #include <Arduino.h>
 #include "moisture_sensor.h"
 
-#define plus_pin            25
-#define neg_pin             35
-#define ADC_pin             34
+// for ESP32 The Thing
+//#define plus_pin            26
+//#define neg_pin             27
+//#define ADC_pin             14
+
+// for Arduino Mega 2560
+#define plus_pin            34
+#define neg_pin             25
+#define ADC_pin             35
 
 Moisture moist(plus_pin, neg_pin, ADC_pin);
 

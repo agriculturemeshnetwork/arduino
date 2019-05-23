@@ -1,8 +1,7 @@
 #include <Arduino.h>
-#define c_one                  0.001592
-#define c_two                  -0.6776
-#define c_three                217.8
-#define c_four                 -1018
+#define c_one                  0.00000000679
+#define c_two                  0.005226
+#define c_three                2.362
 #define resistor               10000
 #define r_one                  600
 #define r_two                  1000
@@ -15,7 +14,7 @@ float Vcc = 4095;
 float resistance = 0;
 float cb = 0;
 int wr = 0;
-int short_delay = 500;
+int short_delay = 50;
 int long_delay = 1000000;
 
 void setup() {
@@ -52,7 +51,7 @@ void loop() {
     
     resistance = (voltageRatio  - 1) * resistor;
 
-    Serial.print("RESISTANCE: "); W
+    Serial.print("RESISTANCE: ");
     Serial.println(resistance);
     
     if ( resistance < 600 ) {
@@ -62,7 +61,7 @@ void loop() {
       cb = (resistance - 550)/50;
     }
     else {
-      cb = c_one * pow(resistance, 3) + c_two * pow(resistance, 2) + c_three * resistance + c_four;
+      cb = c_one * pow(resistance, 2) + c_two * resistance + c_three;
     }
     
     

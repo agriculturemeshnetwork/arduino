@@ -45,10 +45,10 @@ String Moisture::sensorReading() {
     //Serial.print("VOLTAGE: "); 
     //Serial.println(voltage_in);
     digitalWrite(POS, 1);
-    //delayMicroseconds(100);
+    delayMicroseconds(20);
     resistance = -((Vcc/voltage_in)  - 1) * resistor;
     
-    //delayMicroseconds(100);
+    delayMicroseconds(20);
     //average = analogRead(ADC);
     //Serial.print("Averaging: ");
     //Serial.println(average);
@@ -63,17 +63,3 @@ String Moisture::sensorReading() {
     return String(resistance);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

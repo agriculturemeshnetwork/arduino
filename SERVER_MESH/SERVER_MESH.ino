@@ -37,7 +37,7 @@ byte state = LOW;
 // Singleton instance of the radio driver
 RH_RF95 driver(RFM95_CS, RFM95_INT);
 
-RHMesh manager(driver, SERVER2_ADDRESS);
+RHMesh manager(driver, SERVER1_ADDRESS);
 
 
 void led_state(){
@@ -99,7 +99,7 @@ void loop()
     Serial.print(from, HEX);
     Serial.print(": ");
     Serial.println((char*)buf);
-    led_state();
+    //led_state();
 
     // Send a reply back to the originator client
     if (manager.sendtoWait((uint8_t *)data, sizeof(data), from) != RH_ROUTER_ERROR_NONE) {
