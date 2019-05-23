@@ -89,7 +89,7 @@ void setup()
 
 
 char data[] = "Hello World";
-// Dont put this on the stack:
+// Dont put this on the heap:
 uint8_t buf[RH_MESH_MAX_MESSAGE_LEN];
 
 
