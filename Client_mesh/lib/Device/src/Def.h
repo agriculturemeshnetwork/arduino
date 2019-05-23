@@ -1,1 +1,1 @@
-//#define WIFI_TRANSMIT_TRUE
+#define WIFI_TRANSMIT_TRUE

@@ -3,7 +3,7 @@
 
 #ifdef WIFI_TRANSMIT_TRUE
 const char* ssid     = "testSenior";
-const char* password = "JustAnotherPass";
+const char* password = "JustAnotherTest";
 int nodeNumber = 0;
 double temp = 0;
 String TCPbuffer = "";
@@ -34,8 +34,8 @@ bool wifi_transmit::init() {
 
 
 bool wifi_transmit::send_message(String message) {
-   
-	
+   wifi_transmit::flush(message);
+	/*
 	{
 		TCPbuffer = TCPbuffer + message+ "\r\n";
 	}
@@ -63,7 +63,7 @@ bool wifi_transmit::send_message(String message) {
 		
 
 		return true;
-	}
+	}*/
 }
 bool wifi_transmit::flush(String message) {
 
