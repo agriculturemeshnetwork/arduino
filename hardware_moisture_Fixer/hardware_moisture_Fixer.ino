@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define c_one                  0.00000000679
+#define c_one                  0.0000000679
 #define c_two                  0.005226
 #define c_three                2.362
 #define resistor               10000
